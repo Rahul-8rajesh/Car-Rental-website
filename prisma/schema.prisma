@@ -10,7 +10,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// 1. പ്രധാന പശ്ചാത്തലങ്ങൾ (Kerala Theme Slider)
+// 1.  (Kerala Theme Slider)
 model HeroSlide {
   id          Int      @id @default(autoincrement())
   title       String?  // "Welcome to Shijin P.S Cars Online"
@@ -20,7 +20,7 @@ model HeroSlide {
   createdAt   DateTime @default(now())
 }
 
-// 2. വണ്ടികളുടെ തരം (Categories: Cars, Pickup, Travels)
+// 2.  (Categories: Cars, Pickup, Travels)
 model Category {
   id          Int      @id @default(autoincrement())
   name        String   @unique // "Cars", "Pickup", "Travels"
@@ -31,7 +31,7 @@ model Category {
   createdAt   DateTime @default(now())
 }
 
-// 3. വണ്ടികൾ (Cars)
+// 3. (Cars)
 model Car {
   id           Int      @id @default(autoincrement())
   name         String   // Innova Crysta
@@ -44,7 +44,7 @@ model Car {
   ac           Boolean? @default(true)
   featured     Boolean  @default(false)
   
-  // ഏത് കാറ്റഗറി ആണെന്ന് (Car/Pickup/Bus)
+  // (Car/Pickup/Bus)
   categoryId   Int?
   category     Category? @relation(fields: [categoryId], references: [id])
   
@@ -53,7 +53,7 @@ model Car {
   updatedAt    DateTime @updatedAt
 }
 
-// 4. ബുക്കിംഗ് (Bookings - WhatsApp & Admin)
+// 4.(Bookings - WhatsApp & Admin)
 model Booking {
   id             Int      @id @default(autoincrement())
   customerName   String
@@ -70,7 +70,7 @@ model Booking {
   createdAt      DateTime @default(now())
 }
 
-// 5. സേവനങ്ങൾ (Services - Like EVM)
+// 5.  (Services - Like EVM)
 model Service {
   id          Int      @id @default(autoincrement())
   title       String   // "24/7 Support", "Wedding Cars"
@@ -100,7 +100,7 @@ model Review {
   createdAt    DateTime @default(now())
 }
 
-// 8. സൈറ്റ് സെറ്റിംഗ്സ് (Phone, WhatsApp, About Us Text)
+// 8. (Phone, WhatsApp, About Us Text)
 model SiteContent {
   id        Int      @id @default(autoincrement())
   key       String   @unique // "contact_phone", "whatsapp_number", "about_us_text"
