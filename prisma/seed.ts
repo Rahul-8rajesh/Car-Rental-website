@@ -5,86 +5,80 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('Seeding database...');
 
-    // Create categories
-    const cars = await prisma.category.upsert({
-        where: { slug: 'cars' },
-        update: {},
-        create: {
-            name: 'Cars',
-            slug: 'cars',
-            description: 'Comfortable cars for your daily needs',
-            icon: '🚗',
-            subTypes: ['SUV', 'Sedan', 'Hatchback', 'Electric'],
+    // Cleans existing data
+    await prisma.booking.deleteMany();
+    await prisma.car.deleteMany();
+    await prisma.siteSettings.deleteMany();
+
+    // 1. Create Site Settings
+    const settings = await prisma.siteSettings.create({
+        data: {
+            companyName: 'Shijin P.S Cars',
+            phoneNumber: '919562244888',
+            address: 'Kerala, India',
+            heroTitle: 'Find Your Perfect Drive in God\'s Own Country',
+        },
+    });
+    console.log('Created Site Settings:', settings.id);
+
+    // 2. Create Cars (Replacing previous Categories + Cars structure)
+
+    // Category: Cars
+    await prisma.car.create({
+        data: {
+            name: 'Innova Crysta',
+            model: '2024 Model',
+            category: 'Cars',
+            subCategory: 'SUV',
+            transmission: 'Manual',
+            price: 2500,
+            image: '/images/innova.jpg', // Placeholder
+            isAvailable: true,
         },
     });
 
-    const pickup = await prisma.category.upsert({
-        where: { slug: 'pickup' },
-        update: {},
-        create: {
-            name: 'Pickup',
-            slug: 'pickup',
-            description: 'Pickup trucks for cargo and transport',
-            icon: '🛻',
-            subTypes: ['Standard', 'Heavy Duty'],
+    await prisma.car.create({
+        data: {
+            name: 'Swift Dzire',
+            model: '2023 Model',
+            category: 'Cars',
+            subCategory: 'Sedan',
+            transmission: 'Manual',
+            price: 1500,
+            image: '/images/swift.jpg', // Placeholder
+            isAvailable: true,
         },
     });
 
-    const travels = await prisma.category.upsert({
-        where: { slug: 'travels' },
-        update: {},
-        create: {
-            name: 'Travels',
-            slug: 'travels',
-            description: 'Buses and travellers for group journeys',
-            icon: '🚌',
-            subTypes: ['Mini Bus', 'Traveller', 'Luxury Coach'],
+    // Category: Pickup
+    await prisma.car.create({
+        data: {
+            name: 'Mahindra Bolero Pickup',
+            model: 'Heavy Duty',
+            category: 'Pickup',
+            subCategory: 'Standard',
+            transmission: 'Manual',
+            price: 2000,
+            image: '/images/pickup.jpg', // Placeholder
+            isAvailable: true,
         },
     });
 
-    // Create site content
-    await prisma.siteContent.upsert({
-        where: { key: 'contact_phone' },
-        update: {},
-        create: {
-            key: 'contact_phone',
-            value: '+919562244888',
-            label: 'Contact Phone Number',
-        },
-    });
-
-    await prisma.siteContent.upsert({
-        where: { key: 'contact_whatsapp' },
-        update: {},
-        create: {
-            key: 'contact_whatsapp',
-            value: '919562244888',
-            label: 'WhatsApp Number',
-        },
-    });
-
-    await prisma.siteContent.upsert({
-        where: { key: 'about_us' },
-        update: {},
-        create: {
-            key: 'about_us',
-            value: 'Welcome to Shijin P.S Cars Online - your trusted partner for car rentals in Kerala. We offer a wide range of vehicles for all your travel needs.',
-            label: 'About Us Content',
-        },
-    });
-
-    await prisma.siteContent.upsert({
-        where: { key: 'services' },
-        update: {},
-        create: {
-            key: 'services',
-            value: 'We provide airport transfers, tour packages, wedding car rentals, and pilgrimage packages across Kerala.',
-            label: 'Services Description',
+    // Category: Travels
+    await prisma.car.create({
+        data: {
+            name: 'Force Traveller',
+            model: '17 Seater',
+            category: 'Travels',
+            subCategory: 'Traveller',
+            transmission: 'Manual',
+            price: 4000,
+            image: '/images/traveller.jpg', // Placeholder
+            isAvailable: true,
         },
     });
 
     console.log('✅ Database seeded successfully!');
-    console.log('Categories created:', { cars: cars.id, pickup: pickup.id, travels: travels.id });
 }
 
 main()

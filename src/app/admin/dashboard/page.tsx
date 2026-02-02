@@ -12,7 +12,7 @@ export default function Dashboard() {
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl">
                 <Link href="/admin/cars" className="group">
                     <div className="bg-blue-600 hover:bg-blue-700 p-6 md:p-8 rounded-[2rem] shadow-xl transition-all active:scale-95 text-white min-h-[160px] flex flex-col justify-center">
-                        <h2 className="text-2xl font-bold mb-2">Manage Cars</h2>
+                        <h2 className="text-2xl font-bold mb-2">Manage Vehicles</h2>
                         <p className="text-blue-100 opacity-80 text-sm">Add, edit, or remove vehicles from your catalog.</p>
                     </div>
                 </Link>

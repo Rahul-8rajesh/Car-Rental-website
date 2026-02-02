@@ -10,103 +10,35 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// 1.  (Kerala Theme Slider)
-model HeroSlide {
-  id          Int      @id @default(autoincrement())
-  title       String?  // "Welcome to Shijin P.S Cars Online"
-  subtitle    String?  // "Explore God's Own Country"
-  image       String   @db.Text // Background Image (Houseboat, Coconut tree etc)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-}
-
-// 2.  (Categories: Cars, Pickup, Travels)
-model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique // "Cars", "Pickup", "Travels"
-  slug        String   @unique // "cars", "pickup", "travels"
-  description String?
-  icon        String?
-  image       String?  @db.Text
-  subTypes    String[] // ["SUV", "Sedan", "Hatchback", "Electric"]
-  cars        Car[]
-  createdAt   DateTime @default(now())
-}
-
-// 3. (Cars)
 model Car {
-  id           Int      @id @default(autoincrement())
-  name         String   // Innova Crysta
-  model        String?  // 2024 Model
-  rate         String   // ₹2500/day
-  image        String   @db.Text 
-  seats        Int?
-  transmission String?  // "Manual", "Automatic"
-  fuelType     String?  // "Diesel", "Petrol", "Electric"
-  ac           Boolean? @default(true)
-  featured     Boolean  @default(false)
-  
-  // (Car/Pickup/Bus)
-  categoryId   Int?
-  category     Category? @relation(fields: [categoryId], references: [id])
-  
-  bookings     Booking[]
+  id           String   @id @default(cuid())
+  name         String
+  model        String?
+  // പുതിയ ഫീച്ചറുകൾ
+  category     String   @default("Cars") // Options: "Cars", "Pickup", "Travels"
+  subCategory  String?  // Options: "SUV", "Sedan", "Hatchback", "Electric" (Only for Cars)
+  transmission String   @default("Manual") // "Auto", "Manual"
+  price        Float
+  image        String?
+  isAvailable  Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
-// 4.(Bookings - WhatsApp & Admin)
+// സൈറ്റിലെ ഫോൺ നമ്പർ, അഡ്രസ്സ് മാറ്റാൻ
+model SiteSettings {
+  id           String   @id @default(cuid())
+  companyName  String   @default("Shijin P.S Cars")
+  phoneNumber  String   @default("919876543210") // WhatsApp നമ്പറും ഇത് തന്നെ
+  address      String?
+  heroTitle    String   @default("Find Your Perfect Drive")
+}
+
 model Booking {
-  id             Int      @id @default(autoincrement())
-  customerName   String
-  customerPhone  String
-  pickupLocation String
-  pickupDate     String?
-  needDriver     Boolean  @default(false)
-  tripType       String?  // "Self Drive" or "Taxi"
-  status         String   @default("pending") // pending, confirmed, completed
-  
-  carId          Int?
-  car            Car?     @relation(fields: [carId], references: [id])
-  
-  createdAt      DateTime @default(now())
-}
-
-// 5.  (Services - Like EVM)
-model Service {
-  id          Int      @id @default(autoincrement())
-  title       String   // "24/7 Support", "Wedding Cars"
-  description String   @db.Text
-  icon        String?  // Icon name or Image URL
-  createdAt   DateTime @default(now())
-}
-
-// 6. ഓഫറുകൾ (Offers Slider)
-model Offer {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?  @db.Text
-  image       String   @db.Text // Banner Image
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-}
-
-// 7. റിവ്യൂ (Testimonials)
-model Review {
-  id           Int      @id @default(autoincrement())
-  name         String
-  rating       Int      // 1-5
-  comment      String   @db.Text
-  photo        String?  @db.Text // User photo
-  isApproved   Boolean  @default(true)
+  id           String   @id @default(cuid())
+  customerName String
+  phoneNumber  String
+  vehicleName  String
+  details      String?  // Trip type, location etc.
   createdAt    DateTime @default(now())
-}
-
-// 8. (Phone, WhatsApp, About Us Text)
-model SiteContent {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique // "contact_phone", "whatsapp_number", "about_us_text"
-  value     String   @db.Text
-  label     String   // "Phone Number" (For Admin display)
-  updatedAt DateTime @updatedAt
 }

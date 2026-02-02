@@ -130,7 +130,7 @@ export default function ManageCarsPage() {
     return (
         <div className="p-8">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold">Manage Fleet</h1>
+                <h1 className="text-3xl font-bold">Manage Vehicles</h1>
                 <div className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold flex items-center">
                     <CarIcon className="w-5 h-5 mr-2" />
                     {cars.length} Vehicles
@@ -293,7 +293,7 @@ export default function ManageCarsPage() {
                 <Card>
                     <CardContent className="p-12 text-center text-gray-500">
                         <CarIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                        <p className="text-lg">No vehicles in your fleet yet.</p>
+                        <p className="text-lg">No vehicles in your list yet.</p>
                     </CardContent>
                 </Card>
             )}

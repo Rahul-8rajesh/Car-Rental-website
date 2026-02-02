@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Vehicle {
-    id: number;
+    id: string;
     name: string;
     model?: string;
     rate: string;

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 
 interface Vehicle {
-    id: number;
+    id: string;
     name: string;
     model?: string;
     rate: string;
@@ -39,12 +39,11 @@ export default function BookingModal({ vehicle, isOpen, onClose }: BookingModalP
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customerName: formData.name,
-                    customerPhone: formData.phone,
-                    pickupDate: formData.date,
-                    pickupLocation: formData.location,
+                    phoneNumber: formData.phone, // Changed from customerPhone
+                    date: formData.date,
+                    location: formData.location,
                     needDriver: formData.needDriver,
-                    carId: vehicle.id,
-                    vehicleType: 'Car',
+                    vehicleName: vehicle.name, // Changed from carId
                 }),
             });
 
