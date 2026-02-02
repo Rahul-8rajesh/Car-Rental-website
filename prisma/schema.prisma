@@ -25,6 +25,8 @@ model Category {
   id          Int      @id @default(autoincrement())
   name        String   @unique // "Cars", "Pickup", "Travels"
   slug        String   @unique // "cars", "pickup", "travels"
+  description String?
+  icon        String?
   image       String?  @db.Text
   subTypes    String[] // ["SUV", "Sedan", "Hatchback", "Electric"]
   cars        Car[]
