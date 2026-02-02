@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // Cars, Pickup, Travels
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?  // Icon name or emoji
+  subTypes    String[] // ["SUV", "Sedan", "Hatchback", "Electric"] for Cars
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cars        Car[]
+}
+
+model Car {
+  id           Int       @id @default(autoincrement())
+  name         String
+  model        String?   // Optional model name
+  rate         String
+  image        String    @db.Text // Base64 encoded images
+  seats        Int?
+  transmission String?   // Manual, Automatic
+  ac           Boolean?
+  luggage      Int?
+  featured     Boolean   @default(false)
+  categoryId   Int?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+}
+
+model Booking {
+  id              Int      @id @default(autoincrement())
+  customerName    String
+  customerPhone   String
+  pickupDate      String
+  pickupLocation  String
+  needDriver      Boolean  @default(false)
+  carId           Int?
+  car             Car?     @relation(fields: [carId], references: [id])
+  vehicleType     String?  // Cars, Pickup, Travels
+  status          String   @default("pending") // pending, confirmed, completed, cancelled
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Package {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  price       String
+  image       String   @db.Text // Base64 encoded images
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GalleryPhoto {
+  id        Int      @id @default(autoincrement())
+  image     String   @db.Text // Base64 encoded images
+  caption   String?
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  name      String
+  rating    Int
+  comment   String   @db.Text
+  photo     String?  @db.Text // Base64 encoded images (optional)
+  isApproved Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Offer {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @db.Text
+  image       String   @db.Text // Banner image
+  validFrom   DateTime?
+  validUntil  DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteContent {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // about_us, services, contact_phone, contact_whatsapp, etc.
+  value     String   @db.Text
+  label     String   // Human-readable label for admin panel
+  updatedAt DateTime @updatedAt
+}
