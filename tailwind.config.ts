@@ -65,8 +65,17 @@ const config: Config = {
             },
             backgroundImage: {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                'hero-pattern': "url('/patterns/hero-pattern.svg')", // Placeholder if needed
-            }
+                'hero-pattern': "url('/patterns/hero-pattern.svg')",
+            },
+            animation: {
+                gradient: 'gradient 15s ease infinite',
+            },
+            keyframes: {
+                gradient: {
+                    '0%, 100%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                },
+            },
         },
     },
     plugins: [require("tailwindcss-animate")],
