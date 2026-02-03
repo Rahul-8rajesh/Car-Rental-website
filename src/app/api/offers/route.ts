@@ -50,7 +50,7 @@ export async function DELETE(request: NextRequest) {
         }
 
         await prisma.offer.delete({
-            where: { id: parseInt(id) },
+            where: { id },
         });
         return NextResponse.json({ success: true });
     } catch (error) {

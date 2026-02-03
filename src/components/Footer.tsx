@@ -21,7 +21,7 @@ export default function Footer() {
                 <div className="flex flex-col space-y-4">
                     <h3 className="font-semibold text-gray-900">Quick Links</h3>
                     <Link href="/" className="text-sm text-gray-500 hover:text-primary-600">Home</Link>
-                    <Link href="/fleet" className="text-sm text-gray-500 hover:text-primary-600">Our Fleet</Link>
+                    <Link href="/fleet" className="text-sm text-gray-500 hover:text-primary-600">Our Vehicles</Link>
                     <Link href="/packages" className="text-sm text-gray-500 hover:text-primary-600">Packages</Link>
                     <Link href="/contact" className="text-sm text-gray-500 hover:text-primary-600">Contact Us</Link>
                     <Link href="/terms" className="text-sm text-gray-500 hover:text-primary-600">Terms & Conditions</Link>
@@ -40,7 +40,7 @@ export default function Footer() {
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <Mail className="h-5 w-5 text-primary-500" />
-                        <span>info@keralatravels.com</span>
+                        <a href="mailto:Shinjinps@gmail.com" className="hover:text-primary-600 transition-colors">Shinjinps@gmail.com</a>
                     </div>
                 </div>
 
@@ -52,7 +52,7 @@ export default function Footer() {
                             <Instagram className="h-6 w-6" />
                             <span className="sr-only">Instagram</span>
                         </Link>
-                        <Link href="#" className="text-gray-400 hover:text-primary-500">
+                        <Link href="https://www.facebook.com/share/1DdM4SFQ5e/" target="_blank" className="text-gray-400 hover:text-primary-500">
                             <Facebook className="h-6 w-6" />
                             <span className="sr-only">Facebook</span>
                         </Link>
@@ -64,7 +64,8 @@ export default function Footer() {
                 </div>
             </div>
             <div className="container mx-auto mt-12 border-t px-4 pt-8 text-center text-sm text-gray-400">
-                © {new Date().getFullYear()} Kerala Travels. All rights reserved.
+                <p>© {new Date().getFullYear()} Kerala Travels. All rights reserved.</p>
+                <p className="mt-2 text-xs text-gray-500">Website made by Rahul</p>
             </div>
         </footer>
     );

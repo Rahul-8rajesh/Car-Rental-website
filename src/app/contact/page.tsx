@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Facebook } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -66,7 +66,21 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-lg text-foreground mb-1">Email Us</h3>
-                                        <p className="text-muted-foreground">bookings@keralatravels.in</p>
+                                        <a href="mailto:Shinjinps@gmail.com" className="text-muted-foreground hover:text-primary transition-colors block">
+                                            Shinjinps@gmail.com
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-6 group">
+                                    <div className="bg-primary/10 p-4 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                                        <Facebook className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg text-foreground mb-1">Follow Us</h3>
+                                        <Link href="https://www.facebook.com/share/1DdM4SFQ5e/" target="_blank" className="text-muted-foreground hover:text-primary transition-colors block">
+                                            Facebook Page
+                                        </Link>
                                     </div>
                                 </div>
                             </CardContent>

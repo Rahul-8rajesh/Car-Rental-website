@@ -8,6 +8,7 @@ async function main() {
     // Cleans existing data
     await prisma.booking.deleteMany();
     await prisma.car.deleteMany();
+    await prisma.category.deleteMany();
     await prisma.siteSettings.deleteMany();
 
     // 1. Create Site Settings
@@ -21,17 +22,41 @@ async function main() {
     });
     console.log('Created Site Settings:', settings.id);
 
-    // 2. Create Cars (Replacing previous Categories + Cars structure)
+    // 2. Create Categories
+    const carsCategory = await prisma.category.create({
+        data: {
+            name: 'Cars',
+            description: 'Passenger cars for daily use',
+        },
+    });
+
+    const pickupCategory = await prisma.category.create({
+        data: {
+            name: 'Pickup',
+            description: 'Pickup trucks for cargo',
+        },
+    });
+
+    const travelsCategory = await prisma.category.create({
+        data: {
+            name: 'Travels',
+            description: 'Large vehicles for group travel',
+        },
+    });
+
+    console.log('Created Categories');
+
+    // 3. Create Cars
 
     // Category: Cars
     await prisma.car.create({
         data: {
             name: 'Innova Crysta',
             model: '2024 Model',
-            category: 'Cars',
-            subCategory: 'SUV',
+            categoryId: carsCategory.id,
             transmission: 'Manual',
-            price: 2500,
+            rate: '₹2500/day',
+            seats: 7,
             image: '/images/innova.jpg', // Placeholder
             isAvailable: true,
         },
@@ -41,10 +66,10 @@ async function main() {
         data: {
             name: 'Swift Dzire',
             model: '2023 Model',
-            category: 'Cars',
-            subCategory: 'Sedan',
+            categoryId: carsCategory.id,
             transmission: 'Manual',
-            price: 1500,
+            rate: '₹1500/day',
+            seats: 5,
             image: '/images/swift.jpg', // Placeholder
             isAvailable: true,
         },
@@ -55,10 +80,10 @@ async function main() {
         data: {
             name: 'Mahindra Bolero Pickup',
             model: 'Heavy Duty',
-            category: 'Pickup',
-            subCategory: 'Standard',
+            categoryId: pickupCategory.id,
             transmission: 'Manual',
-            price: 2000,
+            rate: '₹2000/day',
+            seats: 3,
             image: '/images/pickup.jpg', // Placeholder
             isAvailable: true,
         },
@@ -69,10 +94,10 @@ async function main() {
         data: {
             name: 'Force Traveller',
             model: '17 Seater',
-            category: 'Travels',
-            subCategory: 'Traveller',
+            categoryId: travelsCategory.id,
             transmission: 'Manual',
-            price: 4000,
+            rate: '₹4000/day',
+            seats: 17,
             image: '/images/traveller.jpg', // Placeholder
             isAvailable: true,
         },

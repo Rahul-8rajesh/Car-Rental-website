@@ -2,6 +2,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -10,28 +11,72 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  cars        Car[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Car {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
   model        String?
-  // പുതിയ ഫീച്ചറുകൾ
-  category     String   @default("Cars") // Options: "Cars", "Pickup", "Travels"
-  subCategory  String?  // Options: "SUV", "Sedan", "Hatchback", "Electric" (Only for Cars)
-  transmission String   @default("Manual") // "Auto", "Manual"
-  price        Float
+  rate         String    // Display rate like "₹26/km"
+  seats        Int?
+  transmission String    @default("Manual")
   image        String?
-  isAvailable  Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  featured     Boolean   @default(false)
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  isAvailable  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Offer {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  validFrom   DateTime?
+  validUntil  DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model TourPackage {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       String
+  duration    String
+  location    String
+  features    String[]
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // സൈറ്റിലെ ഫോൺ നമ്പർ, അഡ്രസ്സ് മാറ്റാൻ
 model SiteSettings {
-  id           String   @id @default(cuid())
-  companyName  String   @default("Shijin P.S Cars")
-  phoneNumber  String   @default("919876543210") // WhatsApp നമ്പറും ഇത് തന്നെ
-  address      String?
-  heroTitle    String   @default("Find Your Perfect Drive")
+  id          String @id @default(cuid())
+  companyName String @default("Shijin P.S Cars")
+  phoneNumber String @default("919876543210") // WhatsApp നമ്പറും ഇത് തന്നെ
+  address     String?
+  heroTitle   String @default("Find Your Perfect Drive")
 }
 
 model Booking {
@@ -40,5 +85,14 @@ model Booking {
   phoneNumber  String
   vehicleName  String
   details      String?  // Trip type, location etc.
+  createdAt    DateTime @default(now())
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  customerName String
+  rating       Int
+  comment      String
+  status       String   @default("PENDING")
   createdAt    DateTime @default(now())
 }

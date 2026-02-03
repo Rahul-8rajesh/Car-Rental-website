@@ -2,12 +2,19 @@ import { PrismaClient } from "@prisma/client";
 import HeroSearch from "@/components/HeroSearch";
 import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
+import ReviewsSection from "@/components/ReviewsSection";
+
+// Force dynamic rendering to always fetch fresh data from database
+export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
 
 // Fetch cars directly from the database
 async function getCars() {
   const cars = await prisma.car.findMany({
+    include: {
+      category: true,
+    },
     orderBy: { createdAt: 'desc' },
     take: 6,
   });
@@ -35,7 +42,7 @@ export default async function Home() {
         </h2>
 
         {cars.length === 0 ? (
-          <p className="text-center text-gray-500">No cars added yet. Please add from Admin Panel.</p>
+          <p className="text-center text-gray-500">No cars added yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {cars.map((car) => (
@@ -59,15 +66,14 @@ export default async function Home() {
                 {/* Details */}
                 <div className="p-5">
                   <div className="text-xs text-emerald-600 font-bold uppercase tracking-wide mb-1">
-                    {car.category} {car.subCategory && `• ${car.subCategory}`}
+                    {car.category?.name || 'Uncategorized'}
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-gray-900">{car.name}</h3>
                   <p className="text-gray-500 text-sm mb-4">{car.model || "Latest Model"}</p>
 
                   <div className="flex justify-between items-center border-t border-gray-100 pt-4">
                     <div>
-                      <span className="text-lg font-bold text-emerald-600">₹{car.price}</span>
-                      <span className="text-xs text-gray-400 font-medium">/day</span>
+                      <span className="text-lg font-bold text-emerald-600">{car.rate}</span>
                     </div>
                     <Link
                       href={`https://wa.me/919562244888?text=${encodeURIComponent(`Hi, I want to book ${car.name}`)}`}
@@ -84,11 +90,8 @@ export default async function Home() {
         )}
       </div>
 
-      <div className="text-center py-4 bg-gray-100">
-        <Link href="/admin/cars" className="text-sm text-gray-500 hover:text-emerald-600 underline">
-          Manage Vehicles
-        </Link>
-      </div>
+      {/* 4. Customer Reviews Section */}
+      <ReviewsSection />
 
     </main>
   );

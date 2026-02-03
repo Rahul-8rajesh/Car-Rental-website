@@ -5,10 +5,13 @@ import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Package, Edit3, X, Image as ImageIcon } from "lucide-react";
 
 interface TourPackage {
-    id: number;
+    id: string;
     title: string;
     description: string;
     price: string;
+    duration: string;
+    location: string;
+    features: string[];
     image: string;
 }
 
@@ -16,38 +19,40 @@ export default function ManagePackagesPage() {
     const [packages, setPackages] = useState<TourPackage[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingPackage, setEditingPackage] = useState<TourPackage | null>(null);
+    const [loading, setLoading] = useState(true);
 
     // Form state
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         price: "",
+        duration: "",
+        location: "",
+        features: "", // Handled as string in form (comma separated or new line)
         image: ""
     });
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    // Load from localStorage on mount
+    // Fetch packages from API
     useEffect(() => {
-        const savedPackages = localStorage.getItem("admin_packages_data");
-        if (savedPackages) {
-            setPackages(JSON.parse(savedPackages));
-        } else {
-            // Default initial data
-            const initialData = [
-                { id: 1, title: "Munnar Bliss", description: "3 Days, 2 Nights in the tea gardens", price: "8500", image: "https://images.unsplash.com/photo-1590623190184-37053e155986?auto=format&fit=crop&q=80&w=2600" },
-                { id: 2, title: "Wayand Wild", description: "4 Days, 3 Nights jungle stay", price: "12000", image: "https://images.unsplash.com/photo-1593181628399-3c3a962f5564?auto=format&fit=crop&q=80&w=2600" }
-            ];
-            setPackages(initialData);
-            localStorage.setItem("admin_packages_data", JSON.stringify(initialData));
-        }
+        fetchPackages();
     }, []);
 
-    // Save to localStorage when packages state changes
-    useEffect(() => {
-        if (packages.length > 0) {
-            localStorage.setItem("admin_packages_data", JSON.stringify(packages));
+    const fetchPackages = async () => {
+        try {
+            const res = await fetch('/api/packages');
+            if (res.ok) {
+                const data = await res.json();
+                setPackages(data);
+            } else {
+                console.error("Failed to fetch packages");
+            }
+        } catch (error) {
+            console.error("Error fetching packages:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [packages]);
+    };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -64,42 +69,104 @@ export default function ManagePackagesPage() {
 
     const handleOpenAdd = () => {
         setEditingPackage(null);
-        setFormData({ title: "", description: "", price: "", image: "" });
+        setFormData({
+            title: "",
+            description: "",
+            price: "",
+            duration: "",
+            location: "",
+            features: "",
+            image: ""
+        });
         setImagePreview(null);
         setIsFormOpen(true);
     };
 
     const handleOpenEdit = (pkg: TourPackage) => {
         setEditingPackage(pkg);
-        setFormData({ title: pkg.title, description: pkg.description, price: pkg.price, image: pkg.image });
+        setFormData({
+            title: pkg.title,
+            description: pkg.description,
+            price: pkg.price,
+            duration: pkg.duration || "",
+            location: pkg.location || "",
+            features: pkg.features ? pkg.features.join(", ") : "",
+            image: pkg.image || ""
+        });
         setImagePreview(pkg.image);
         setIsFormOpen(true);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.title || !formData.price) return;
 
-        if (editingPackage) {
-            setPackages(packages.map(p => p.id === editingPackage.id ? { ...p, ...formData } : p));
-        } else {
-            const newPackage: TourPackage = {
-                ...formData,
-                id: Date.now(),
-                image: formData.image || "https://images.unsplash.com/photo-1582963458063-8a033390884a?auto=format&fit=crop&q=80&w=2600"
-            };
-            setPackages([...packages, newPackage]);
+        const featuresArray = formData.features.split(",").map(f => f.trim()).filter(f => f !== "");
+
+        const payload = {
+            ...formData,
+            features: featuresArray
+        };
+
+        try {
+            if (editingPackage) {
+                // Update existing package
+                const res = await fetch(`/api/packages/${editingPackage.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    fetchPackages();
+                    setIsFormOpen(false);
+                } else {
+                    alert('Failed to update package');
+                }
+            } else {
+                // Create new package
+                const res = await fetch('/api/packages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    fetchPackages();
+                    setIsFormOpen(false);
+                } else {
+                    alert('Failed to create package');
+                }
+            }
+        } catch (error) {
+            console.error("Error saving package:", error);
+            alert("An error occurred while saving");
         }
-        setIsFormOpen(false);
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm("Are you sure you want to delete this package?")) {
-            const updated = packages.filter(p => p.id !== id);
-            setPackages(updated);
-            localStorage.setItem("admin_packages_data", JSON.stringify(updated));
+    const handleDelete = async (id: string) => {
+        if (confirm("Are you sure you want to permanently delete this package?")) {
+            try {
+                const res = await fetch(`/api/packages/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    alert("Package deleted successfully!");
+                    fetchPackages();
+                } else {
+                    alert("Failed to delete package");
+                }
+            } catch (error) {
+                console.error("Error deleting package:", error);
+                alert("An error occurred while deleting.");
+            }
         }
     };
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans">
@@ -136,19 +203,24 @@ export default function ManagePackagesPage() {
                         <div key={pkg.id} className="bg-white rounded-[2.5rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all group flex flex-col">
                             <div className="h-56 overflow-hidden relative">
                                 <img
-                                    src={pkg.image}
+                                    src={pkg.image || "https://images.unsplash.com/photo-1590623190184-37053e155986?auto=format&fit=crop&q=80&w=2600"}
                                     alt={pkg.title}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 />
                                 <div className="absolute top-4 right-4 bg-blue-600 text-white px-4 py-1.5 rounded-xl shadow-lg font-bold text-lg">
-                                    ₹{pkg.price}
+                                    {pkg.price}
                                 </div>
                             </div>
                             <div className="p-8 flex-grow">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-3 truncate">{pkg.title}</h3>
-                                <p className="text-gray-500 mb-8 line-clamp-2 md:line-clamp-3 leading-relaxed">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="text-2xl font-bold text-gray-900 truncate flex-1">{pkg.title}</h3>
+                                </div>
+                                <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">{pkg.location} • {pkg.duration}</div>
+
+                                <p className="text-gray-500 mb-6 line-clamp-3 leading-relaxed">
                                     {pkg.description}
                                 </p>
+
                                 <div className="grid grid-cols-2 gap-4 mt-auto">
                                     <button
                                         onClick={() => handleOpenEdit(pkg)}
@@ -182,7 +254,7 @@ export default function ManagePackagesPage() {
             {isFormOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm" onClick={() => setIsFormOpen(false)} />
-                    <div className="relative bg-white w-full max-w-2xl rounded-[3rem] p-10 md:p-12 shadow-2xl animate-in fade-in zoom-in duration-300">
+                    <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[3rem] p-10 md:p-12 shadow-2xl animate-in fade-in zoom-in duration-300">
                         <div className="flex justify-between items-center mb-10">
                             <h2 className="text-3xl font-bold text-gray-900">
                                 {editingPackage ? "Edit Package" : "Add New Package"}
@@ -192,7 +264,7 @@ export default function ManagePackagesPage() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-600 ml-1">Package Title</label>
                                 <input
@@ -204,24 +276,62 @@ export default function ManagePackagesPage() {
                                     required
                                 />
                             </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-600 ml-1">Location</label>
+                                    <input
+                                        type="text"
+                                        value={formData.location}
+                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                        placeholder="e.g. Munnar, Kerala"
+                                        className="w-full h-14 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-600 ml-1">Duration</label>
+                                    <input
+                                        type="text"
+                                        value={formData.duration}
+                                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                        placeholder="e.g. 3 Days / 2 Nights"
+                                        className="w-full h-14 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-600 ml-1">Description (Days/Nights, etc.)</label>
+                                <label className="text-sm font-bold text-gray-600 ml-1">Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="e.g. 3 Days, 2 Nights stay in premium resort"
-                                    className="w-full h-32 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 py-4 focus:border-blue-500 focus:bg-white transition-all outline-none resize-none"
+                                    placeholder="e.g. Explore the misty hills..."
+                                    className="w-full h-24 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 py-4 focus:border-blue-500 focus:bg-white transition-all outline-none resize-none"
                                     required
                                 />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-gray-600 ml-1">Features (comma separated)</label>
+                                <input
+                                    type="text"
+                                    value={formData.features}
+                                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                                    placeholder="e.g. Tea Garden, Waterfalls, Trekking"
+                                    className="w-full h-14 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-600 ml-1">Price (₹)</label>
+                                    <label className="text-sm font-bold text-gray-600 ml-1">Price</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         value={formData.price}
                                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                        placeholder="e.g. 8500"
+                                        placeholder="e.g. From ₹8,500"
                                         className="w-full h-14 rounded-2xl border-2 border-gray-100 bg-gray-50 px-6 focus:border-blue-500 focus:bg-white transition-all outline-none"
                                         required
                                     />

@@ -42,21 +42,4 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function DELETE(request: NextRequest) {
-    try {
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id');
 
-        if (!id) {
-            return NextResponse.json({ error: 'Car ID required' }, { status: 400 });
-        }
-
-        await prisma.car.delete({
-            where: { id: parseInt(id) },
-        });
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Error deleting car:', error);
-        return NextResponse.json({ error: 'Failed to delete car' }, { status: 500 });
-    }
-}

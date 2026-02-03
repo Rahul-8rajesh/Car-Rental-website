@@ -44,13 +44,13 @@ export default function HeroSection() {
                         transition={{ duration: 0.8, delay: 0.6 }}
                     >
                         <a
-                            href="#cars"
+                            href="/fleet"
                             className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg shadow-emerald-900/50"
                         >
                             Browse Cars
                         </a>
                         <a
-                            href="#contact"
+                            href="/contact"
                             className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold transition-all border border-white/20"
                         >
                             Contact Us

@@ -5,30 +5,24 @@ const prisma = new PrismaClient();
 
 export async function GET() {
     try {
-        const cars = await prisma.car.findMany({
+        const categories = await prisma.category.findMany({
+            include: {
+                cars: true,
+            },
             orderBy: {
-                createdAt: 'desc',
+                createdAt: 'asc',
             },
         });
 
-        // Group cars by category
-        const groupedCars = cars.reduce((acc, car) => {
-            if (!acc[car.category]) {
-                acc[car.category] = [];
-            }
-            acc[car.category].push(car);
-            return acc;
-        }, {} as Record<string, typeof cars>);
-
-        // Format as array of categories
-        const categories = Object.keys(groupedCars).map((key, index) => ({
-            id: String(index + 1), // Generate a string ID for the category
-            name: key,
-            slug: key.toLowerCase().replace(/\s+/g, '-'),
-            cars: groupedCars[key],
+        // Format categories with slug
+        const formattedCategories = categories.map((category) => ({
+            id: category.id,
+            name: category.name,
+            slug: category.name.toLowerCase().replace(/\s+/g, '-'),
+            cars: category.cars,
         }));
 
-        return NextResponse.json(categories);
+        return NextResponse.json(formattedCategories);
     } catch (error) {
         console.error('Error fetching categories:', error);
         return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
